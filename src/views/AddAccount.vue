@@ -54,10 +54,24 @@ export default {
   },
   methods: {
     addUser () {
-      if (this.content === this.contentRecheck) {
-        this.postNewUser()
+      const reg = new RegExp("[`~!@#$^&*()=|{}':;',\\[\\].<>/?~！@#￥……&*（）——|{}【】‘；：”“'。，、？%]")
+      const result = reg.test(this.newUser.content)
+      const reEmail = /\S+@\S+.\S+/
+      const resultEmail = reEmail.test(this.newUser.category)
+      if (this.newUser.category === '') {
+        alert('使用者帳號不得為空，請重新填寫')
+      } else if (!resultEmail) {
+        alert('Email格式不正確')
+      } else if (this.newUser.content === '' || this.newUser.contentRecheck === '') {
+        alert('密碼不得為空，請重新填寫')
+      } else if (this.newUser.content !== this.newUser.contentRecheck) {
+        alert('確認密碼不符合，請重新輸入')
+      } else if (this.newUser.content.length < 8) {
+        alert('密碼長度請設定至少8個字元')
+      } else if (result) {
+        alert('密碼僅接受英文與數字')
       } else {
-        alert('確認密碼不符合')
+        this.postNewUser()
       }
     },
     postNewUser () {
@@ -68,6 +82,9 @@ export default {
           this.isLoading = false
           console.log(response)
           alert('已完成新增')
+          this.newUser.category = ''
+          this.newUser.content = ''
+          this.newUser.contentRecheck = ''
         })
     }
   },

@@ -3,19 +3,19 @@
     <nav class="navbar navbar-light bg-light mb-2 search_box">
       <div class="container-fluid">
         <form class="d-flex">
-          <input class="form-control me-2" type="search" placeholder="xxx@example.com" aria-label="Search" v-model="searchText">
-          <button class="btn btn-outline-success" type="submit" @click.prevent="searchAccount">搜尋</button>
+          <button class="btn btn-success me-2" type="button" disabled>搜尋</button>
+          <input class="form-control " type="search" placeholder="xxx@example.com" aria-label="Search" v-model="searchText">
         </form>
       </div>
     </nav>
     <table class="table border rounded-3 table-hover">
         <tbody >
-            <tr v-for="item in apiAccount" :key="item.id">
+            <tr v-for="item in filterData" :key="item.id">
             <td>{{item.category}}</td>
             <td>
                 <div class="btn-group">
                 <button class="btn btn-outline-primary btn-sm" @click.prevent="openModal(false, item)">編輯</button>
-                <button class="btn btn-outline-danger btn-sm">刪除</button>
+                <button class="btn btn-outline-danger btn-sm" @click.prevent="openDelAccountModal(item)">刪除</button>
                 </div>
             </td>
             </tr>
@@ -25,6 +25,7 @@
     ref="accountModal" :account="tempAccount" @update-account="updateAccount"
     ></accountModal>
     <pagination :pages="pagination" @emit-pages="getAccountList"></pagination>
+    <delModal ref="delModal" :item="tempAccount" @del-item="delAccount"></delModal>
 </template>
 
 <style lang="scss">
@@ -46,8 +47,9 @@ table{
 </style>
 
 <script>
-import accountModal from '../components/AccountModal.vue'
 import pagination from '../components/Pagination.vue'
+import accountModal from '@/components/AccountModal.vue'
+import delModal from '@/components/DelModal.vue'
 export default {
   data () {
     return {
@@ -119,12 +121,20 @@ export default {
       isNew: false,
       isLoading: false,
       searchText: '',
-      filterAccount: []
+      filterAccount: ''
     }
   },
   components: {
     accountModal,
-    pagination
+    pagination,
+    delModal
+  },
+  computed: {
+    filterData () {
+      return this.apiAccount.filter(item => {
+        return item.category.match(this.searchText)
+      })
+    }
   },
   methods: {
     getAccountList (page = 1) {
@@ -168,23 +178,20 @@ export default {
         this.getAccountList()
       })
     },
-    searchAccount () {
-      console.log('搜尋')
-      if (this.searchText === '') {
-        alert('請輸入搜尋內容')
-        return
-      }
-      this.filterAccount = this.apiAccount.filter(function (item) {
-        if (item.category) {
-          return item.category.match(this.searchText)
-        }
-        return false
-      })
-      if (this.filterAccount.length === 0) {
-        alert('糟糕，好像沒有你要找的帳號!')
-      } else {
+    // 開啟刪除的Modal
+    openDelAccountModal (item) {
+      this.tempAccount = { ...item }
+      const delComponent = this.$refs.delModal
+      delComponent.showModal()
+    },
+    delAccount () {
+      const url = `${process.env.VUE_APP_API}api/${process.env.VUE_APP_PATH}/admin/product/${this.tempAccount.id}`
+      this.$http.delete(url).then((response) => {
+        console.log(response.data)
+        const delComponent = this.$refs.delModal
+        delComponent.hideModal()
         this.getAccountList()
-      }
+      })
     }
   },
   created () {
