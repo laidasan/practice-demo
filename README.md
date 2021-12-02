@@ -11,6 +11,6 @@ Hello  Nick, Ocean兩位好：
 
 
 >▸ 並附上測試網址 -
->  [demo連結](http://localhost:8080/?#/login) </br>
+>  [demo連結](https://junefish1414.github.io/Practice-Demo/#/) </br>
 > (最新更新時間 2021/12/02) 
 
