@@ -19,7 +19,7 @@
             </tr>
         </tbody>
     </table>
-    <accountModal ref="productsModal"></accountModal>
+    <productsModal ref="productsModal" :products="tempProduct" @update-products="updateProducts"></productsModal>
 </template>
 
 <style lang="scss">
@@ -50,7 +50,7 @@ table{
 </style>
 
 <script>
-import accountModal from '@/components/AccountModal.vue'
+import productsModal from '@/components/ProductsModal.vue'
 export default {
   data () {
     return {
@@ -64,11 +64,12 @@ export default {
         code: 'testCode'
       },
       isLoading: false,
-      isNew: false
+      isNew: false,
+      tempProduct: {}
     }
   },
   components: {
-    accountModal
+    productsModal
   },
   methods: {
     getProducts (page = 1) {
@@ -91,7 +92,6 @@ export default {
       const api = `${process.env.VUE_APP_API}api/${process.env.VUE_APP_PATH}/admin/coupon`
       this.$http.post(api, { data: this.newProducts })
         .then((res) => {
-          console.log('這是新增', res)
           this.isLoading = false
           alert('已完成新增')
           this.newProducts.title = ''
@@ -101,14 +101,31 @@ export default {
     },
     openProductModal (isNew, item) {
       console.log('我打開了~')
-    //   if (isNew) {
-    //     this.tempProduct = {}
-    //   } else {
-    //     this.tempProduct = { ...item }
-    //   }
-    //   this.isNew = isNew
-    //   const productComponent = this.$refs.productModal
-    //   productComponent.showModal()
+      if (isNew) {
+        this.tempProduct = {}
+      } else {
+        this.tempProduct = { ...item }
+      }
+      this.isNew = isNew
+      const productComponent = this.$refs.productsModal
+      productComponent.showModal()
+    },
+    updateProducts (item) {
+      this.tempProducts = item
+      // 新增
+      let api = `${process.env.VUE_APP_API}api/${process.env.VUE_APP_PATH}/admin/coupon`
+      let httpMethod = 'post'
+
+      // 編輯
+      if (!this.isNew) {
+        api = `${process.env.VUE_APP_API}api/${process.env.VUE_APP_PATH}/admin/coupon/${item.id}`
+        httpMethod = 'put'
+      }
+      const productComponent = this.$refs.productsModal
+      this.$http[httpMethod](api, { data: this.tempProducts }).then((response) => {
+        productComponent.hideModal()
+        this.getProducts()
+      })
     }
   },
   mounted () {
