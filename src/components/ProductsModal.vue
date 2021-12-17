@@ -49,7 +49,6 @@ export default {
   methods: {
   },
   mounted () {
-    console.log('驗證資料傳遞', this.tempProducts)
   },
   mixins: [modalMixin]
 }

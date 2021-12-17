@@ -115,7 +115,6 @@ export default {
         this.isLoading = false
       } else {
         this.tempAddProducts.push(Object.assign({}, this.newProducts))
-        console.log('this.temAddProducts', this.tempAddProducts)
         this.isLoading = false
         this.newProducts.title = ''
         this.newProducts.percent = ''
@@ -124,6 +123,7 @@ export default {
     },
     addProductsToList () {
       this.isLoading = true
+      console.log(this.tempAddProducts)
       const api = `${process.env.VUE_APP_API}api/${process.env.VUE_APP_PATH}/admin/coupon`
       this.$http.post(api, { data: this.tempAddProducts })
         .then((res) => {
@@ -131,7 +131,7 @@ export default {
           this.isLoading = false
           this.newProducts.title = ''
           this.newProducts.percent = ''
-          alert('已送出所有新增囉')
+          alert('已送出所有菜單囉')
           this.tempAddProducts = []
         })
     },
