@@ -4,11 +4,14 @@
     <form class="addproducts">
         <label class="mb-2 mt-2 dish-input"><span>名稱</span><input class="ms-3" type="text" v-model="newProducts.title" required></label>
         <label class="mb-2 mt-2 dish-input"><span>價格</span><input class="ms-3" type="number" required v-model="newProducts.percent" placeholder="只需填寫金額"></label>
-        <label class="mb-2 mt-2"><span>菜單料理</span><button class="ms-3 btn btn-primary btn-sm" type="submit" @click.prevent="addProducts">新增</button></label>
+        <label class="mb-2 mt-2"><span>菜單料理</span><button class="ms-3 btn btn-primary btn-sm" type="submit" @click.prevent="addtempProducts">新增</button></label>
     </form>
+    <div class="noInfo" v-if="tempAddProducts.length === 0">
+        <p>目前還沒新增資料唷！</p>
+    </div>
     <table class="table border rounded-3 table-hover">
         <tbody >
-            <tr v-for="(item,index) in products" :key="item.title">
+            <tr v-for="(item,index) in tempAddProducts" :key="item.title">
             <td>{{item.title}}</td>
             <td>
                 <button type="text" @click.prevent="dataUp(item,index)">↑</button>
@@ -23,6 +26,7 @@
             </tr>
         </tbody>
     </table>
+    <button class="btn btn-sm btn-outline-primary btn-block" type="submit" @click.prevent="addProductsToList"> 送出 </button>
     <productsModal ref="productsModal" :products="tempProduct" @update-products="updateProducts"></productsModal>
 </template>
 
@@ -35,6 +39,18 @@ table{
     }
     td:nth-child(2){
         text-align: right;
+    }
+}
+.noInfo{
+    color: #AAA;
+    text-align: center;
+    border-radius: 5px;
+    width: 100%;
+    padding: 5px 25px;
+    border: 1px solid;
+    p {
+    margin-top: 0;
+    margin-bottom: 0;
     }
 }
 .addproducts{
@@ -71,7 +87,8 @@ export default {
       isNew: false,
       tempProduct: {},
       newData: {},
-      newData2: {}
+      newData2: {},
+      tempAddProducts: []
     }
   },
   components: {
@@ -92,22 +109,31 @@ export default {
           }
         })
     },
-    addProducts () {
-      this.isLoading = true
-      const api = `${process.env.VUE_APP_API}api/${process.env.VUE_APP_PATH}/admin/coupon`
-      if (this.newProducts.title === '' || this.newProducts.percent === 0) {
+    addtempProducts () {
+      if (this.newProducts.title === '' || this.newProducts.percent <= 0) {
         alert('請正確輸入商品資訊')
         this.isLoading = false
       } else {
-        this.$http.post(api, { data: this.newProducts })
-          .then((res) => {
-            this.isLoading = false
-            alert('已完成新增')
-            this.newProducts.title = ''
-            this.newProducts.percent = ''
-            this.getProducts()
-          })
+        this.tempAddProducts.push(Object.assign({}, this.newProducts))
+        console.log('this.temAddProducts', this.tempAddProducts)
+        this.isLoading = false
+        this.newProducts.title = ''
+        this.newProducts.percent = ''
+        alert('已完成新增')
       }
+    },
+    addProductsToList () {
+      this.isLoading = true
+      const api = `${process.env.VUE_APP_API}api/${process.env.VUE_APP_PATH}/admin/coupon`
+      this.$http.post(api, { data: this.tempAddProducts })
+        .then((res) => {
+          console.log(res.data)
+          this.isLoading = false
+          this.newProducts.title = ''
+          this.newProducts.percent = ''
+          alert('已送出所有新增囉')
+          this.tempAddProducts = []
+        })
     },
     openProductModal (isNew, item) {
       console.log('我打開了~')
@@ -145,21 +171,21 @@ export default {
         alert('已經是最上筆資料囉')
         return
       }
-      this.newData = this.products.splice(index, 1)
-      this.newData2 = this.products.splice([index - 1], 0, item)
-      console.log(this.products)
+      this.newData = this.tempAddProducts.splice(index, 1)
+      this.newData2 = this.tempAddProducts.splice([index - 1], 0, item)
+      console.log(this.tempAddProducts)
     },
     // 調整順序(往下){
     dataDown (item, index) {
       console.log('往上')
       this.tempData = item
-      if (index === this.products.length - 1) {
+      if (index === this.tempAddProducts.length - 1) {
         alert('已經是最末筆資料囉')
         return
       }
-      this.newData = this.products.splice(index, 1)
-      this.newData2 = this.products.splice([index + 1], 0, item)
-      console.log(this.products)
+      this.newData = this.tempAddProducts.splice(index, 1)
+      this.newData2 = this.tempAddProducts.splice([index + 1], 0, item)
+      console.log(this.tempAddProducts)
     }
   },
   mounted () {
