@@ -8,8 +8,12 @@
     </form>
     <table class="table border rounded-3 table-hover">
         <tbody >
-            <tr v-for="item in products" :key="item.title">
+            <tr v-for="(item,index) in products" :key="item.title">
             <td>{{item.title}}</td>
+            <td>
+                <button type="text" @click.prevent="dataUp(item,index)">↑</button>
+                <button type="text" @click.prevent="dataDown(item,index)">↓</button>
+            </td>
             <td>
                 <div class="btn-group">
                 <button class="btn btn-outline-primary btn-sm" @click.prevent="openProductModal(false, item)">編輯</button>
@@ -65,7 +69,9 @@ export default {
       },
       isLoading: false,
       isNew: false,
-      tempProduct: {}
+      tempProduct: {},
+      newData: {},
+      newData2: {}
     }
   },
   components: {
@@ -77,7 +83,6 @@ export default {
       const api = `${process.env.VUE_APP_API}api/${process.env.VUE_APP_PATH}/admin/coupons?page=${page}`
       this.$http.get(api)
         .then((res) => {
-          console.log('這是列表', res)
           this.isLoading = false
           if (res.data.success) {
             this.products = res.data.coupons
@@ -90,14 +95,19 @@ export default {
     addProducts () {
       this.isLoading = true
       const api = `${process.env.VUE_APP_API}api/${process.env.VUE_APP_PATH}/admin/coupon`
-      this.$http.post(api, { data: this.newProducts })
-        .then((res) => {
-          this.isLoading = false
-          alert('已完成新增')
-          this.newProducts.title = ''
-          this.newProducts.percent = ''
-          this.getProducts()
-        })
+      if (this.newProducts.title === '' || this.newProducts.percent === 0) {
+        alert('請正確輸入商品資訊')
+        this.isLoading = false
+      } else {
+        this.$http.post(api, { data: this.newProducts })
+          .then((res) => {
+            this.isLoading = false
+            alert('已完成新增')
+            this.newProducts.title = ''
+            this.newProducts.percent = ''
+            this.getProducts()
+          })
+      }
     },
     openProductModal (isNew, item) {
       console.log('我打開了~')
@@ -126,6 +136,30 @@ export default {
         productComponent.hideModal()
         this.getProducts()
       })
+    },
+    // 調整順序(往上){
+    dataUp (item, index) {
+      console.log('往上')
+      this.tempData = item
+      if (index === 0) {
+        alert('已經是最上筆資料囉')
+        return
+      }
+      this.newData = this.products.splice(index, 1)
+      this.newData2 = this.products.splice([index - 1], 0, item)
+      console.log(this.products)
+    },
+    // 調整順序(往下){
+    dataDown (item, index) {
+      console.log('往上')
+      this.tempData = item
+      if (index === this.products.length - 1) {
+        alert('已經是最末筆資料囉')
+        return
+      }
+      this.newData = this.products.splice(index, 1)
+      this.newData2 = this.products.splice([index + 1], 0, item)
+      console.log(this.products)
     }
   },
   mounted () {
