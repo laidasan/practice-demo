@@ -46,19 +46,21 @@ export default {
   },
   methods: {
     getProducts (page = 1) {
-      this.isLoading = true
-      const api = `${process.env.VUE_APP_API}api/${process.env.VUE_APP_PATH}/admin/coupons?page=${page}`
-      this.$http.get(api)
-        .then((res) => {
-          console.log('這是列表', res)
-          this.isLoading = false
-          if (res.data.success) {
-            this.products = res.data.coupons
-            this.pagination = res.data.pagination
-          } else {
-            console.error(res.data)
-          }
-        })
+      const sendProducts = localStorage.getItem('tempProducts')
+      this.products = JSON.parse(sendProducts)
+    //   this.isLoading = true
+    //   const api = `${process.env.VUE_APP_API}api/${process.env.VUE_APP_PATH}/admin/coupons?page=${page}`
+    //   this.$http.get(api)
+    //     .then((res) => {
+    //       console.log('這是列表', res)
+    //       this.isLoading = false
+    //       if (res.data.success) {
+    //         this.products = res.data.coupons
+    //         this.pagination = res.data.pagination
+    //       } else {
+    //         console.error(res.data)
+    //       }
+    //     })
     },
     openProductModal (isNew, item) {
       console.log('我打開了~')

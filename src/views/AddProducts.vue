@@ -131,8 +131,9 @@ export default {
           this.isLoading = false
           this.newProducts.title = ''
           this.newProducts.percent = ''
+          const tempProductString = JSON.stringify(this.tempAddProducts)
+          localStorage.setItem('tempProducts', tempProductString)
           alert('已送出所有菜單囉')
-          this.tempAddProducts = []
         })
     },
     openProductModal (isNew, item) {
