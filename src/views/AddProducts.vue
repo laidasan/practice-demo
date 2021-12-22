@@ -121,19 +121,38 @@ export default {
         this.newProducts.percent = ''
         alert('已完成新增')
         this.$refs.productName.focus()
-        console.log(this.showTempProducts)
       }
     },
+    // addProductsToList () {
+    //   console.log('舊的清單', this.tempAddProducts, '新的清單', this.showTempProducts)
+    //   // const getTogether = Object.assign({}, { ...this.tempAddProducts }, { ...this.showTempProducts })
+    //   const getTogether = [this.tempAddProducts.concat(this.showTempProducts)]
+    //   const tempProductString = JSON.stringify(getTogether)
+    //   localStorage.setItem('tempProducts', tempProductString)
+    //   alert('已送出所有菜單囉!')
+    //   this.showTempProducts = []
+    //   this.tempAddProducts = JSON.parse(localStorage.getItem('tempProducts'))
+    // },
     addProductsToList () {
-      console.log('舊的清單', this.tempAddProducts, '新的清單', this.showTempProducts)
-      const getTogether = Object.assign({}, { ...this.tempAddProducts }, { ...this.showTempProducts })
+      console.log(
+        '舊的清單',
+        this.tempAddProducts,
+        '新的清單',
+        this.showTempProducts
+      )
+      const getTogether = this.showTempProducts.concat(this.tempAddProducts)
+
       console.log(getTogether)
       const tempProductString = JSON.stringify(getTogether)
       localStorage.setItem('tempProducts', tempProductString)
       alert('已送出所有菜單囉!')
       this.showTempProducts = []
-      this.tempAddProducts = JSON.parse(localStorage.getItem('tempProducts'))
+      this.tempAddProducts = getTogether
+
+      // console.log("最後");
+      // console.log(this.tempAddProducts);
     },
+
     openProductModal (isNew, item) {
       console.log('我打開了~')
       if (isNew) {
