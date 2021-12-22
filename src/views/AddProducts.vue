@@ -126,12 +126,10 @@ export default {
     },
     addProductsToList () {
       console.log('舊的清單', this.tempAddProducts, '新的清單', this.showTempProducts)
-      const newProducts = { ...this.showTempProducts }
-      console.log(newProducts)
-      // const getTogether = this.tempAddProducts.unshift(this.showTempProducts)
-      // console.log(getTogether)
-      // const tempProductString = JSON.stringify(this.showTempProducts)
-      // localStorage.setItem('tempProducts', tempProductString)
+      const getTogether = Object.assign({}, { ...this.tempAddProducts }, { ...this.showTempProducts })
+      console.log(getTogether)
+      const tempProductString = JSON.stringify(getTogether)
+      localStorage.setItem('tempProducts', tempProductString)
       alert('已送出所有菜單囉!')
       this.showTempProducts = []
       this.tempAddProducts = JSON.parse(localStorage.getItem('tempProducts'))
