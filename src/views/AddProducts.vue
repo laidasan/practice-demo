@@ -2,16 +2,16 @@
     <Loading :active="isLoading"></Loading>
     <h3>新增產品頁面</h3>
     <form class="addproducts">
-        <label class="mb-2 mt-2 dish-input"><span>名稱</span><input class="ms-3" type="text" v-model="newProducts.title" required></label>
+        <label class="mb-2 mt-2 dish-input"><span>名稱</span><input class="ms-3" type="text" v-model="newProducts.title" required ref="productName"></label>
         <label class="mb-2 mt-2 dish-input"><span>價格</span><input class="ms-3" type="number" required v-model="newProducts.percent" placeholder="只需填寫金額"></label>
         <label class="mb-2 mt-2"><span>菜單料理</span><button class="ms-3 btn btn-primary btn-sm" type="submit" @click.prevent="addtempProducts">新增</button></label>
     </form>
-    <div class="noInfo" v-if="tempAddProducts.length === 0">
+    <div class="noInfo" v-if="showTempProducts.length === 0">
         <p>目前還沒新增資料唷！</p>
     </div>
     <table class="table border rounded-3 table-hover">
         <tbody >
-            <tr v-for="(item,index) in tempAddProducts" :key="item.title">
+            <tr v-for="(item,index) in showTempProducts" :key="item.title">
             <td>{{item.title}}</td>
             <td>
                 <button type="text" @click.prevent="dataUp(item,index)">↑</button>
@@ -88,7 +88,8 @@ export default {
       tempProduct: {},
       newData: {},
       newData2: {},
-      tempAddProducts: []
+      showTempProducts: [],
+      tempAddProducts: JSON.parse(localStorage.getItem('tempProducts')) || []
     }
   },
   components: {
@@ -114,27 +115,26 @@ export default {
         alert('請正確輸入商品資訊')
         this.isLoading = false
       } else {
-        this.tempAddProducts.push(Object.assign({}, this.newProducts))
+        this.showTempProducts.unshift({ ...this.newProducts })
         this.isLoading = false
         this.newProducts.title = ''
         this.newProducts.percent = ''
         alert('已完成新增')
+        this.$refs.productName.focus()
+        console.log(this.showTempProducts)
       }
     },
     addProductsToList () {
-      this.isLoading = true
-      console.log(this.tempAddProducts)
-      const api = `${process.env.VUE_APP_API}api/${process.env.VUE_APP_PATH}/admin/coupon`
-      this.$http.post(api, { data: this.tempAddProducts })
-        .then((res) => {
-          console.log(res.data)
-          this.isLoading = false
-          this.newProducts.title = ''
-          this.newProducts.percent = ''
-          const tempProductString = JSON.stringify(this.tempAddProducts)
-          localStorage.setItem('tempProducts', tempProductString)
-          alert('已送出所有菜單囉')
-        })
+      console.log('舊的清單', this.tempAddProducts, '新的清單', this.showTempProducts)
+      const newProducts = { ...this.showTempProducts }
+      console.log(newProducts)
+      // const getTogether = this.tempAddProducts.unshift(this.showTempProducts)
+      // console.log(getTogether)
+      // const tempProductString = JSON.stringify(this.showTempProducts)
+      // localStorage.setItem('tempProducts', tempProductString)
+      alert('已送出所有菜單囉!')
+      this.showTempProducts = []
+      this.tempAddProducts = JSON.parse(localStorage.getItem('tempProducts'))
     },
     openProductModal (isNew, item) {
       console.log('我打開了~')
@@ -172,21 +172,19 @@ export default {
         alert('已經是最上筆資料囉')
         return
       }
-      this.newData = this.tempAddProducts.splice(index, 1)
-      this.newData2 = this.tempAddProducts.splice([index - 1], 0, item)
-      console.log(this.tempAddProducts)
+      this.newData = this.showTempProducts.splice(index, 1)
+      this.newData2 = this.showTempProducts.splice([index - 1], 0, item)
     },
     // 調整順序(往下){
     dataDown (item, index) {
       console.log('往上')
       this.tempData = item
-      if (index === this.tempAddProducts.length - 1) {
+      if (index === this.showTempProducts.length - 1) {
         alert('已經是最末筆資料囉')
         return
       }
-      this.newData = this.tempAddProducts.splice(index, 1)
-      this.newData2 = this.tempAddProducts.splice([index + 1], 0, item)
-      console.log(this.tempAddProducts)
+      this.newData = this.showTempProducts.splice(index, 1)
+      this.newData2 = this.showTempProducts.splice([index + 1], 0, item)
     }
   },
   mounted () {
