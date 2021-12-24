@@ -81,7 +81,8 @@ export default {
         is_enabled: 1,
         percent: 0,
         due_date: 1555459200,
-        code: 'testCode'
+        code: 'testCode',
+        id: ''
       },
       isLoading: false,
       isNew: false,
@@ -96,25 +97,13 @@ export default {
     productsModal
   },
   methods: {
-    getProducts (page = 1) {
-      this.isLoading = true
-      const api = `${process.env.VUE_APP_API}api/${process.env.VUE_APP_PATH}/admin/coupons?page=${page}`
-      this.$http.get(api)
-        .then((res) => {
-          this.isLoading = false
-          if (res.data.success) {
-            this.products = res.data.coupons
-            this.pagination = res.data.pagination
-          } else {
-            console.error(res.data)
-          }
-        })
-    },
     addtempProducts () {
       if (this.newProducts.title === '' || this.newProducts.percent <= 0) {
         alert('請正確輸入商品資訊')
         this.isLoading = false
       } else {
+        const timestamp = new Date().getTime()
+        this.newProducts.id = timestamp
         this.showTempProducts.unshift({ ...this.newProducts })
         this.isLoading = false
         this.newProducts.title = ''
@@ -123,16 +112,6 @@ export default {
         this.$refs.productName.focus()
       }
     },
-    // addProductsToList () {
-    //   console.log('舊的清單', this.tempAddProducts, '新的清單', this.showTempProducts)
-    //   // const getTogether = Object.assign({}, { ...this.tempAddProducts }, { ...this.showTempProducts })
-    //   const getTogether = [this.tempAddProducts.concat(this.showTempProducts)]
-    //   const tempProductString = JSON.stringify(getTogether)
-    //   localStorage.setItem('tempProducts', tempProductString)
-    //   alert('已送出所有菜單囉!')
-    //   this.showTempProducts = []
-    //   this.tempAddProducts = JSON.parse(localStorage.getItem('tempProducts'))
-    // },
     addProductsToList () {
       console.log(
         '舊的清單',
@@ -148,11 +127,7 @@ export default {
       alert('已送出所有菜單囉!')
       this.showTempProducts = []
       this.tempAddProducts = getTogether
-
-      // console.log("最後");
-      // console.log(this.tempAddProducts);
     },
-
     openProductModal (isNew, item) {
       console.log('我打開了~')
       if (isNew) {
@@ -166,20 +141,15 @@ export default {
     },
     updateProducts (item) {
       this.tempProducts = item
-      // 新增
-      let api = `${process.env.VUE_APP_API}api/${process.env.VUE_APP_PATH}/admin/coupon`
-      let httpMethod = 'post'
-
-      // 編輯
-      if (!this.isNew) {
-        api = `${process.env.VUE_APP_API}api/${process.env.VUE_APP_PATH}/admin/coupon/${item.id}`
-        httpMethod = 'put'
-      }
-      const productComponent = this.$refs.productsModal
-      this.$http[httpMethod](api, { data: this.tempProducts }).then((response) => {
-        productComponent.hideModal()
-        this.getProducts()
+      console.log('修改後的item', item, item.id)
+      this.showTempProducts.forEach(function (i) {
+        if (item.id === i.id) {
+          i.title = item.title
+          i.percent = item.percent
+        }
       })
+      const productComponent = this.$refs.productsModal
+      productComponent.hideModal()
     },
     // 調整順序(往上){
     dataUp (item, index) {
@@ -205,7 +175,6 @@ export default {
     }
   },
   mounted () {
-    this.getProducts()
   }
 }
 </script>
