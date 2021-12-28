@@ -26,7 +26,7 @@
         v-for="item in filterData"
         :key="item.id"
       >
-        <td>{{ item.category }}</td>
+        <td>{{ item.account }}</td>
         <td>
           <div class="btn-group">
             <button
@@ -148,7 +148,7 @@ export default {
   computed: {
     filterData () {
       return this.apiAccount.filter(item => {
-        return item.category.match(this.searchText)
+        return item.account.match(this.searchText)
       })
     }
   },
@@ -163,7 +163,12 @@ export default {
         .then((res) => {
           this.isLoading = false
           if (res.data.success) {
-            this.apiAccount = res.data.products
+            // this.apiAccount = res.data.products
+            this.apiAccount = res.data.products.map(({ category: account, content: password }) => ({
+              account,
+              password
+            }))
+            console.log(this.apiAccount)
             this.pagination = res.data.pagination
           } else {
             console.error(res.data)
