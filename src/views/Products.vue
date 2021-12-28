@@ -2,18 +2,20 @@
     <Loading :active="isLoading"></Loading>
     <table class="table border rounded-3 table-hover">
         <tbody>
-            <tr v-for="item in products" :key="item.id">
+            <tr v-for="item in productsList" :key="item.id">
                 <td>{{item.title}}</td>
                 <td>
                     <div class="btn-group">
                     <button class="btn btn-outline-primary btn-sm" @click.prevent="openProductModal(false, item)">編輯</button>
-                <button class="btn btn-outline-danger btn-sm" @click.prevent="openDelAccountModal(item)">刪除</button>
+                <button class="btn btn-outline-danger btn-sm" @click.prevent="openDelProductModal(item)">刪除</button>
                     </div>
                 </td>
             </tr>
         </tbody>
     </table>
     <productsModal ref="productsModal" :products="tempProduct" @update-products="updateProducts"></productsModal>
+    <delModal ref="delModal" :item="tempProduct" @del-item="delProduct"></delModal>
+    <pagination :pages="pagination" @emit-pages="getProducts"></pagination>
 </template>
 
 <style lang="scss">
@@ -31,39 +33,47 @@
 
 <script>
 import productsModal from '@/components/ProductsModal.vue'
+import pagination from '../components/Pagination.vue'
+import delModal from '@/components/DelModal.vue'
 export default {
   data () {
     return {
       products: [],
-      pagination: {},
+      productsList: [],
+      pagination: {
+        current_page: 1,
+        has_next: false,
+        has_pre: false,
+        total_pages: 1
+      },
       isLoading: false,
       isNew: false,
       tempProduct: {}
     }
   },
   components: {
-    productsModal
+    productsModal,
+    pagination,
+    delModal
   },
   methods: {
     getProducts (page = 1) {
       const sendProducts = localStorage.getItem('tempProducts')
       this.products = JSON.parse(sendProducts)
-    //   this.isLoading = true
-    //   const api = `${process.env.VUE_APP_API}api/${process.env.VUE_APP_PATH}/admin/coupons?page=${page}`
-    //   this.$http.get(api)
-    //     .then((res) => {
-    //       console.log('這是列表', res)
-    //       this.isLoading = false
-    //       if (res.data.success) {
-    //         this.products = res.data.coupons
-    //         this.pagination = res.data.pagination
-    //       } else {
-    //         console.error(res.data)
-    //       }
-    //     })
+      this.current_page = page
+      const perpage = 10
+      const pageIndexStart = (page - 1) * perpage
+      const pageIndexEnd = (page * perpage) - 1
+      // console.log(this.products[pageIndexStart], this.products[pageIndexEnd])
+      this.productsList = []
+      this.products.forEach((item, index) => {
+        if (index >= pageIndexStart && index <= pageIndexEnd) {
+          this.productsList.push(item)
+        }
+      })
+      this.pagination.total_pages = Math.ceil(this.products.length / perpage)
     },
     openProductModal (isNew, item) {
-      console.log('我打開了~')
       if (isNew) {
         this.tempProduct = {}
       } else {
@@ -74,21 +84,36 @@ export default {
       productComponent.showModal()
     },
     updateProducts (item) {
-      this.tempProducts = item
-      // 新增
-      let api = `${process.env.VUE_APP_API}api/${process.env.VUE_APP_PATH}/admin/coupon`
-      let httpMethod = 'post'
-
-      // 編輯
-      if (!this.isNew) {
-        api = `${process.env.VUE_APP_API}api/${process.env.VUE_APP_PATH}/admin/coupon/${item.id}`
-        httpMethod = 'put'
-      }
-      const productComponent = this.$refs.productsModal
-      this.$http[httpMethod](api, { data: this.tempProducts }).then((response) => {
-        productComponent.hideModal()
-        this.getProducts()
+      this.tempProduct = item
+      console.log('修改後的item', item, item.id)
+      this.products.forEach(function (i) {
+        if (item.id === i.id) {
+          i.title = item.title
+          i.percent = item.percent
+        }
       })
+      const productComponent = this.$refs.productsModal
+      productComponent.hideModal()
+      const modifiedProductString = JSON.stringify(this.products)
+      localStorage.setItem('tempProducts', modifiedProductString)
+    },
+    // 開啟刪除的Modal
+    openDelProductModal (item) {
+      this.tempProduct = { ...item }
+      const delComponent = this.$refs.delModal
+      delComponent.showModal()
+    },
+    delProduct () {
+      const delComponent = this.$refs.delModal
+      const delProduct = this.tempProduct.id
+      const delIndex = this.products.findIndex(function (item) {
+        return delProduct === item.id
+      })
+      console.log(delIndex)
+      this.products.splice(delIndex, 1)
+      const modifiedProductString = JSON.stringify(this.products)
+      localStorage.setItem('tempProducts', modifiedProductString)
+      delComponent.hideModal()
     }
   },
   mounted () {

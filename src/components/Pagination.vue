@@ -1,16 +1,41 @@
 <template>
   <nav aria-label="Page navigation example">
     <ul class="pagination justify-content-center">
-      <li class="page-item" :class="{'disabled': pages.has_pre === false}">
-        <a class="page-link" href="#" aria-label="Previous" @click.prevent="updatePage(item)">
+      <li
+        class="page-item"
+        :class="{'disabled': pages.has_pre === false}"
+      >
+        <a
+          class="page-link"
+          href="#"
+          aria-label="Previous"
+          @click.prevent="updatePage(item)"
+        >
           <span aria-hidden="true">&laquo;</span>
         </a>
       </li>
-      <li class="page-item" v-for="item in pages.total_pages" :key="item" :class="{ 'active': item === pages.current_page }">
-        <a class="page-link" href="#" @click.prevent="updatePage(item)" >{{item}}</a>
+      <li
+        v-for="item in pages.total_pages"
+        :key="item"
+        class="page-item"
+        :class="{ 'active': item === pages.current_page }"
+      >
+        <a
+          class="page-link"
+          href="#"
+          @click.prevent="updatePage(item)"
+        >{{ item }}</a>
       </li>
-      <li class="page-item" :class="{'disabled': pages.has_next === false}">
-        <a class="page-link" href="#" aria-label="Next" @click.prevent="updatePage(item)">
+      <li
+        class="page-item"
+        :class="{'disabled': pages.has_next === false}"
+      >
+        <a
+          class="page-link"
+          href="#"
+          aria-label="Next"
+          @click.prevent="updatePage(item)"
+        >
           <span aria-hidden="true">&raquo;</span>
         </a>
       </li>
@@ -29,19 +54,20 @@ export default {
       default () { return {} }
     }
   },
-  watch: {
-    pages () {
-      this.temPages = this.pages
-    }
-  },
   data () {
     return {
       temPages: {}
     }
   },
+  watch: {
+    pages () {
+      this.temPages = this.pages
+    }
+  },
   methods: {
     updatePage (item) {
-      console.log(item)
+      /* eslint-disable */
+      this.pages.current_page = item
       this.$emit('emit-pages', item)
     }
   }

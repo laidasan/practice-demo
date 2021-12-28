@@ -1,26 +1,24 @@
+/* eslint-disable vue/component-tags-order */
 <template>
-    <div class="all_box">
-        <Navbar></Navbar>
-        <div class="container-fluid col-10 ">
-            <router-view/>
-        </div>
-     </div>
+  <div class="all_box">
+    <Navbar />
+    <div class="container-fluid col-10 ">
+      <router-view />
+    </div>
+  </div>
 </template>
-
-<style lang="scss">
-    .all_box{
-        display: flex;
-        width: 100%;
-        max-width: 900px;
-        margin: 0 auto;
-    }
-</style>
 
 <script>
 import Navbar from '../components/Navbar.vue'
+import emitter from '@/methods/emitter'
 export default {
   components: {
     Navbar
+  },
+  provide () {
+    return {
+      emitter
+    }
   },
   created () {
     const token = document.cookie.replace(/(?:(?:^|.*;\s*)juneToken\s*=\s*([^;]*).*$)|^.*$/, '$1')
@@ -35,3 +33,12 @@ export default {
   }
 }
 </script>
+
+<style lang="scss">
+    .all_box{
+        display: flex;
+        width: 100%;
+        max-width: 900px;
+        margin: 0 auto;
+    }
+</style>

@@ -1,56 +1,77 @@
 <template>
-  <Loading :active="isLoading"></Loading>
-    <nav class="navbar navbar-light bg-light mb-2 search_box">
-      <div class="container-fluid">
-        <form class="d-flex">
-          <button class="btn btn-success me-2" type="button" disabled>搜尋</button>
-          <input class="form-control " type="search" placeholder="xxx@example.com" aria-label="Search" v-model="searchText">
-        </form>
-      </div>
-    </nav>
-    <table class="table border rounded-3 table-hover">
-        <tbody >
-            <tr v-for="item in filterData" :key="item.id">
-            <td>{{item.category}}</td>
-            <td>
-                <div class="btn-group">
-                <button class="btn btn-outline-primary btn-sm" @click.prevent="openModal(false, item)">編輯</button>
-                <button class="btn btn-outline-danger btn-sm" @click.prevent="openDelAccountModal(item)">刪除</button>
-                </div>
-            </td>
-            </tr>
-        </tbody>
-    </table>
-    <accountModal
-    ref="accountModal" :account="tempAccount" @update-account="updateAccount"
-    ></accountModal>
-    <pagination :pages="pagination" @emit-pages="getAccountList"></pagination>
-    <delModal ref="delModal" :item="tempAccount" @del-item="delAccount"></delModal>
+  <Loading :active="isLoading" />
+  <nav class="navbar navbar-light bg-light mb-2 search_box">
+    <div class="container-fluid">
+      <form class="d-flex">
+        <button
+          class="btn btn-success me-2"
+          type="button"
+          disabled
+        >
+          搜尋
+        </button>
+        <input
+          v-model="searchText"
+          class="form-control "
+          type="search"
+          placeholder="xxx@example.com"
+          aria-label="Search"
+        >
+      </form>
+    </div>
+  </nav>
+  <table class="table border rounded-3 table-hover">
+    <tbody>
+      <tr
+        v-for="item in filterData"
+        :key="item.id"
+      >
+        <td>{{ item.category }}</td>
+        <td>
+          <div class="btn-group">
+            <button
+              class="btn btn-outline-primary btn-sm"
+              @click.prevent="openModal(false, item)"
+            >
+              編輯
+            </button>
+            <button
+              class="btn btn-outline-danger btn-sm"
+              @click.prevent="openDelAccountModal(item)"
+            >
+              刪除
+            </button>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <accountModal
+    ref="accountModal"
+    :account="tempAccount"
+    @update-account="updateAccount"
+  />
+  <pagination
+    :pages="pagination"
+    @emit-pages="getAccountList"
+  />
+  <delModal
+    ref="delModal"
+    :item="tempAccount"
+    @del-item="delAccount"
+  />
 </template>
-
-<style lang="scss">
-.search_box{
-  .btn{
-    width: 100px;
-  }
-}
-table{
-    border-collapse: separate;
-    border-spacing: 0;
-    td{
-        vertical-align: middle;
-    }
-    td:nth-child(2){
-        text-align: right;
-    }
-}
-</style>
-
 <script>
 import pagination from '../components/Pagination.vue'
 import accountModal from '@/components/AccountModal.vue'
 import delModal from '@/components/DelModal.vue'
 export default {
+  components: {
+    accountModal,
+    pagination,
+    delModal
+  },
+  inject: ['emmiter'],
   data () {
     return {
       account: [
@@ -124,17 +145,15 @@ export default {
       filterAccount: ''
     }
   },
-  components: {
-    accountModal,
-    pagination,
-    delModal
-  },
   computed: {
     filterData () {
       return this.apiAccount.filter(item => {
         return item.category.match(this.searchText)
       })
     }
+  },
+  created () {
+    this.getAccountList()
   },
   methods: {
     getAccountList (page = 1) {
@@ -193,9 +212,24 @@ export default {
         this.getAccountList()
       })
     }
-  },
-  created () {
-    this.getAccountList()
   }
 }
 </script>
+
+<style lang="scss">
+.search_box{
+  .btn{
+    width: 100px;
+  }
+}
+table{
+    border-collapse: separate;
+    border-spacing: 0;
+    td{
+        vertical-align: middle;
+    }
+    td:nth-child(2){
+        text-align: right;
+    }
+}
+</style>

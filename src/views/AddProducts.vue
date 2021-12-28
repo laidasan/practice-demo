@@ -20,7 +20,7 @@
             <td>
                 <div class="btn-group">
                 <button class="btn btn-outline-primary btn-sm" @click.prevent="openProductModal(false, item)">編輯</button>
-                <button class="btn btn-outline-danger btn-sm" @click.prevent="openDelAccountModal(item)">刪除</button>
+                <button class="btn btn-outline-danger btn-sm" @click.prevent="openDelProductModal(item)">刪除</button>
                 </div>
             </td>
             </tr>
@@ -28,6 +28,8 @@
     </table>
     <button class="btn btn-sm btn-outline-primary btn-block" type="submit" @click.prevent="addProductsToList"> 送出 </button>
     <productsModal ref="productsModal" :products="tempProduct" @update-products="updateProducts"></productsModal>
+    <delModal ref="delModal" :item="tempProduct" @del-item="delProduct"></delModal>
+
 </template>
 
 <style lang="scss">
@@ -71,6 +73,7 @@ table{
 
 <script>
 import productsModal from '@/components/ProductsModal.vue'
+import delModal from '@/components/DelModal.vue'
 export default {
   data () {
     return {
@@ -89,12 +92,20 @@ export default {
       tempProduct: {},
       newData: {},
       newData2: {},
-      showTempProducts: [],
+      showTempProducts: [{
+        title: '預設資料',
+        is_enabled: 1,
+        percent: 100,
+        due_date: 1555459200,
+        code: 'testCode',
+        id: 'june0601'
+      }],
       tempAddProducts: JSON.parse(localStorage.getItem('tempProducts')) || []
     }
   },
   components: {
-    productsModal
+    productsModal,
+    delModal
   },
   methods: {
     addtempProducts () {
@@ -104,8 +115,8 @@ export default {
       } else {
         const timestamp = new Date().getTime()
         this.newProducts.id = timestamp
-        this.showTempProducts.unshift({ ...this.newProducts })
         this.isLoading = false
+        this.showTempProducts.unshift({ ...this.newProducts })
         this.newProducts.title = ''
         this.newProducts.percent = ''
         alert('已完成新增')
@@ -150,6 +161,23 @@ export default {
       })
       const productComponent = this.$refs.productsModal
       productComponent.hideModal()
+    },
+    // 開啟刪除的Modal
+    openDelProductModal (item) {
+      this.tempProduct = { ...item }
+      const delComponent = this.$refs.delModal
+      delComponent.showModal()
+    },
+    delProduct () {
+      const delComponent = this.$refs.delModal
+      console.log('刪除商品', this.tempProduct.id)
+      const delProduct = this.tempProduct.id
+      const delIndex = this.showTempProducts.findIndex(function (item) {
+        return delProduct === item.id
+      })
+      console.log(delIndex)
+      this.showTempProducts.splice(delIndex, 1)
+      delComponent.hideModal()
     },
     // 調整順序(往上){
     dataUp (item, index) {

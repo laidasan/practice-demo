@@ -18,14 +18,25 @@ const routes = [
   {
     path: '/login',
     name: 'Login',
-    component: () => import('../views/Login.vue')
+    component: () => import('../views/Login.vue'),
+    beforeEnter (to, from, next) {
+      const api = `${process.env.VUE_APP_API}admin/signin`
+      this.$http.post(api, this.user)
+        .then((res) => {
+          if (res.data.success) {
+            next({ path: '/account' })
+          }
+        })
+    }
   },
+  // 登入才可使用的頁面
   {
     path: '/dashboard',
     component: () => import('../views/Dashboard.vue'),
     children: [
       {
         path: 'account',
+        name: 'account',
         component: () => import('../views/Account.vue')
       },
       {
