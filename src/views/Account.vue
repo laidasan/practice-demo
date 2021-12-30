@@ -65,6 +65,7 @@
 import pagination from '../components/Pagination.vue'
 import accountModal from '@/components/AccountModal.vue'
 import delModal from '@/components/DelModal.vue'
+
 export default {
   components: {
     accountModal,
@@ -164,9 +165,11 @@ export default {
           this.isLoading = false
           if (res.data.success) {
             // this.apiAccount = res.data.products
-            this.apiAccount = res.data.products.map(({ category: account, content: password }) => ({
+            console.log(res.data.products)
+            this.apiAccount = res.data.products.map(({ category: account, content: password, id }) => ({
               account,
-              password
+              password,
+              id
             }))
             console.log(this.apiAccount)
             this.pagination = res.data.pagination
@@ -183,10 +186,19 @@ export default {
       }
       this.isNew = isNew
       const accountComponent = this.$refs.accountModal
-      accountComponent.showModal()
+      accountComponent.show()
     },
     updateAccount (item) {
-      this.tempAccount = item
+      this.tempAccount = {
+        title: 'new',
+        category: item.account,
+        content: item.password,
+        id: item.id,
+        contentRecheck: '',
+        unit: 'new',
+        origin_price: 66,
+        price: 66
+      }
       // 新增
       let api = `${process.env.VUE_APP_API}api/${process.env.VUE_APP_PATH}/admin/product`
       let httpMethod = 'post'
@@ -198,7 +210,8 @@ export default {
       }
       const accountComponent = this.$refs.accountModal
       this.$http[httpMethod](api, { data: this.tempAccount }).then((response) => {
-        accountComponent.hideModal()
+        console.log(response)
+        accountComponent.hide()
         this.getAccountList()
       })
     },
@@ -206,14 +219,14 @@ export default {
     openDelAccountModal (item) {
       this.tempAccount = { ...item }
       const delComponent = this.$refs.delModal
-      delComponent.showModal()
+      delComponent.show()
     },
     delAccount () {
       const url = `${process.env.VUE_APP_API}api/${process.env.VUE_APP_PATH}/admin/product/${this.tempAccount.id}`
       this.$http.delete(url).then((response) => {
         console.log(response.data)
         const delComponent = this.$refs.delModal
-        delComponent.hideModal()
+        delComponent.hide()
         this.getAccountList()
       })
     }
