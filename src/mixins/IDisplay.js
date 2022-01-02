@@ -2,8 +2,7 @@ export default {
 
   data () {
     return {
-      isShow: false,
-      name: 'YOHO'
+      isShow: false
     }
   },
 

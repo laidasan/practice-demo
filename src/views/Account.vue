@@ -165,13 +165,11 @@ export default {
           this.isLoading = false
           if (res.data.success) {
             // this.apiAccount = res.data.products
-            console.log(res.data.products)
             this.apiAccount = res.data.products.map(({ category: account, content: password, id }) => ({
               account,
               password,
               id
             }))
-            console.log(this.apiAccount)
             this.pagination = res.data.pagination
           } else {
             console.error(res.data)
@@ -210,13 +208,13 @@ export default {
       }
       const accountComponent = this.$refs.accountModal
       this.$http[httpMethod](api, { data: this.tempAccount }).then((response) => {
-        console.log(response)
         accountComponent.hide()
         this.getAccountList()
       })
     },
     // 開啟刪除的Modal
     openDelAccountModal (item) {
+      console.log('打開刪除')
       this.tempAccount = { ...item }
       const delComponent = this.$refs.delModal
       delComponent.show()
@@ -227,6 +225,7 @@ export default {
         console.log(response.data)
         const delComponent = this.$refs.delModal
         delComponent.hide()
+        alert('資料已刪除')
         this.getAccountList()
       })
     }
