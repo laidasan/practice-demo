@@ -3,27 +3,28 @@
   <nav class="navbar navbar-light bg-light mb-2 search_box">
     <div class="container-fluid">
       <form class="d-flex">
-        <button
-          class="btn btn-success me-2"
-          type="button"
-          disabled
-        >
-          搜尋
-        </button>
         <input
-          v-model="searchText"
-          class="form-control "
+          :value="searchText"
+          class="form-control me-2"
           type="search"
           placeholder="xxx@example.com"
           aria-label="Search"
+          @input="setSearchText"
         >
+        <button
+          class="btn btn-success me-2"
+          type="button"
+          @click.prevent="filterAccount"
+        >
+          搜尋
+        </button>
       </form>
     </div>
   </nav>
   <table class="table border rounded-3 table-hover">
     <tbody>
       <tr
-        v-for="item in filterData"
+        v-for="item in apiAccount"
         :key="item.id"
       >
         <td>{{ item.account }}</td>
@@ -143,14 +144,7 @@ export default {
       isNew: false,
       isLoading: false,
       searchText: '',
-      filterAccount: ''
-    }
-  },
-  computed: {
-    filterData () {
-      return this.apiAccount.filter(item => {
-        return item.account.match(this.searchText)
-      })
+      filterData: {}
     }
   },
   created () {
@@ -214,7 +208,6 @@ export default {
     },
     // 開啟刪除的Modal
     openDelAccountModal (item) {
-      console.log('打開刪除')
       this.tempAccount = { ...item }
       const delComponent = this.$refs.delModal
       delComponent.show()
@@ -222,11 +215,25 @@ export default {
     delAccount () {
       const url = `${process.env.VUE_APP_API}api/${process.env.VUE_APP_PATH}/admin/product/${this.tempAccount.id}`
       this.$http.delete(url).then((response) => {
-        console.log(response.data)
         const delComponent = this.$refs.delModal
         delComponent.hide()
         alert('資料已刪除')
         this.getAccountList()
+      })
+    },
+    // 搜尋
+    setSearchText (e) {
+      this.searchText = e.target.value
+      if (this.searchText === '') {
+        this.getAccountList()
+      }
+    },
+    filterAccount () {
+      if (this.searchText === '') {
+        alert('搜尋資料不得為空')
+      }
+      this.apiAccount = this.apiAccount.filter(item => {
+        return item.account.match(this.searchText)
       })
     }
   }
