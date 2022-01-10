@@ -1,40 +1,40 @@
 <template>
-    <Loading :active="isLoading"></Loading>
-    <h5 class="bg-light mb-2 p-2 rounded-1 fw-bold">新增帳號</h5>
-    <form class="addAccount p-3">
-        <label class="AccSingle rounded-3 mb-3">Email
-            <input
-        type="email"
+  <Loading :active="isLoading" />
+  <h5 class="bg-light mb-2 p-2 rounded-1 fw-bold">
+    新增帳號
+  </h5>
+  <form class="addAccount p-3">
+    <label class="AccSingle rounded-3 mb-3">Email
+      <input
         id="inputEmail"
+        v-model="newUser.category"
+        type="email"
         class="form-control"
         placeholder="xxx@example.com"
         required
         autofocus
-        v-model="newUser.category"></label>
-        <label class="AccSingle rounded-3 mb-3">密碼<input type="password"
-                required v-model="newUser.content"></label>
-        <label class="AccSingle rounded-3 mb-5">確認密碼<input type="password"
-                required v-model="newUser.contentRecheck"></label>
-        <div class="mt-4">
-            <button class="btn btn-sm btn-outline-primary btn-block" type="submit" @click="addUser">送出</button>
-        </div>
-    </form>
+      ></label>
+    <label class="AccSingle rounded-3 mb-3">密碼<input
+      v-model="newUser.content"
+      type="password"
+      required
+    ></label>
+    <label class="AccSingle rounded-3 mb-5">確認密碼<input
+      v-model="newUser.contentRecheck"
+      type="password"
+      required
+    ></label>
+    <div class="mt-4">
+      <button
+        class="btn btn-sm btn-outline-primary btn-block"
+        type="submit"
+        @click="addUser"
+      >
+        送出
+      </button>
+    </div>
+  </form>
 </template>
-
-<style lang="scss">
-    .addAccount{
-        max-width:350px;
-        .AccSingle{
-            width: 100%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            input{
-                width: 200px;
-            }
-        }
-    }
-</style>
 
 <script>
 export default {
@@ -51,6 +51,9 @@ export default {
       },
       isLoading: false
     }
+  },
+  mounted () {
+
   },
   methods: {
     addUser () {
@@ -87,9 +90,21 @@ export default {
           this.newUser.contentRecheck = ''
         })
     }
-  },
-  mounted () {
-
   }
 }
 </script>
+
+<style lang="scss">
+    .addAccount{
+        max-width:350px;
+        .AccSingle{
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            input{
+                width: 200px;
+            }
+        }
+    }
+</style>
