@@ -1,41 +1,63 @@
 <template>
-    <Loading :active="isLoading"></Loading>
-    <table class="table border rounded-3 table-hover">
-        <tbody>
-            <tr v-for="item in productsList" :key="item.id">
-                <td>{{item.title}}</td>
-                <td>
-                    <div class="btn-group">
-                    <button class="btn btn-outline-primary btn-sm" @click.prevent="openProductModal(false, item)">編輯</button>
-                <button class="btn btn-outline-danger btn-sm" @click.prevent="openDelProductModal(item)">刪除</button>
-                    </div>
-                </td>
-            </tr>
-        </tbody>
-    </table>
-    <productsModal ref="productsModal" :products="tempProduct" @update-products="updateProducts"></productsModal>
-    <delModal ref="delModal" :item="tempProduct" @del-item="delProduct"></delModal>
-    <pagination :pages="pagination" @emit-pages="getProducts"></pagination>
+  <Loading :active="isLoading" />
+  <div
+    v-if="products.length === 0"
+    class="noInfo"
+  >
+    <p>目前還沒有任何產品！快去新增吧</p>
+  </div>
+  <table class="table border rounded-3 table-hover">
+    <tbody>
+      <tr
+        v-for="item in productsList"
+        :key="item.id"
+      >
+        <td>{{ item.title }}</td>
+        <td>
+          <div class="btn-group">
+            <button
+              class="btn btn-outline-primary btn-sm"
+              @click.prevent="openProductModal(false, item)"
+            >
+              編輯
+            </button>
+            <button
+              class="btn btn-outline-danger btn-sm"
+              @click.prevent="openDelProductModal(item)"
+            >
+              刪除
+            </button>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <productsModal
+    ref="productsModal"
+    :products="tempProduct"
+    @update-products="updateProducts"
+  />
+  <delModal
+    ref="delModal"
+    :item="tempProduct"
+    @del-item="delProduct"
+  />
+  <pagination
+    :pages="pagination"
+    @emit-pages="getProducts"
+  />
 </template>
-
-<style lang="scss">
-    table{
-    border-collapse: separate;
-    border-spacing: 0;
-    td{
-        vertical-align: middle;
-    }
-    td:nth-child(2){
-        text-align: right;
-    }
-}
-</style>
 
 <script>
 import productsModal from '@/components/ProductsModal.vue'
 import pagination from '../components/Pagination.vue'
 import delModal from '@/components/DelModal.vue'
 export default {
+  components: {
+    productsModal,
+    pagination,
+    delModal
+  },
   data () {
     return {
       products: [],
@@ -51,10 +73,8 @@ export default {
       tempProduct: {}
     }
   },
-  components: {
-    productsModal,
-    pagination,
-    delModal
+  mounted () {
+    this.getProducts()
   },
   methods: {
     getProducts (page = 1) {
@@ -81,7 +101,8 @@ export default {
       }
       this.isNew = isNew
       const productComponent = this.$refs.productsModal
-      productComponent.showModal()
+      productComponent.show()
+      console.log(this.tempProduct)
     },
     updateProducts (item) {
       this.tempProduct = item
@@ -93,7 +114,7 @@ export default {
         }
       })
       const productComponent = this.$refs.productsModal
-      productComponent.hideModal()
+      productComponent.hide()
       const modifiedProductString = JSON.stringify(this.products)
       localStorage.setItem('tempProducts', modifiedProductString)
     },
@@ -101,7 +122,7 @@ export default {
     openDelProductModal (item) {
       this.tempProduct = { ...item }
       const delComponent = this.$refs.delModal
-      delComponent.showModal()
+      delComponent.show()
     },
     delProduct () {
       const delComponent = this.$refs.delModal
@@ -109,15 +130,25 @@ export default {
       const delIndex = this.products.findIndex(function (item) {
         return delProduct === item.id
       })
-      console.log(delIndex)
       this.products.splice(delIndex, 1)
       const modifiedProductString = JSON.stringify(this.products)
       localStorage.setItem('tempProducts', modifiedProductString)
-      delComponent.hideModal()
+      delComponent.hide()
+      this.getProducts()
     }
-  },
-  mounted () {
-    this.getProducts()
   }
 }
 </script>
+
+<style lang="scss">
+    table{
+    border-collapse: separate;
+    border-spacing: 0;
+    td{
+        vertical-align: middle;
+    }
+    td:nth-child(2){
+        text-align: right;
+    }
+}
+</style>

@@ -16,7 +16,7 @@
       <div class="modal-content border-0">
         <div class="modal-header bg-danger text-white">
           <h5 class="modal-title">
-            <span>刪除 {{ item.account }}</span>
+            <span>刪除 {{ item.account }}{{ item.title }}</span>
           </h5>
           <button
             type="button"
@@ -27,7 +27,7 @@
           />
         </div>
         <div class="modal-body">
-          是否刪除 <strong class="text-danger">{{ item.account }}</strong> (刪除後將無法恢復)。
+          是否刪除 <strong class="text-danger">{{ item.account }}{{ item.title }}</strong> (刪除後將無法恢復)。
         </div>
         <div class="modal-footer">
           <button
