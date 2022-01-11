@@ -76,100 +76,50 @@ export default {
   inject: ['emmiter'],
   data () {
     return {
-      account: [
-        {
-          email: 'nick@104.com.tw',
-          password: 'test01'
-        },
-        {
-          email: 'ocean@104.com.tw',
-          password: 'test02'
-        },
-        {
-          email: 'joe@104.com.tw',
-          password: 'test03'
-        },
-        {
-          email: 'shine@104.com.tw',
-          password: 'test04'
-        },
-        {
-          email: 'leo@104.com.tw',
-          password: 'test05'
-        },
-        {
-          email: 'jane@104.com.tw',
-          password: 'test06'
-        },
-        {
-          email: 'bob@104.com.tw',
-          password: 'test07'
-        },
-        {
-          email: 'wang@104.com.tw',
-          password: 'test08'
-        },
-        {
-          email: 'jay@104.com.tw',
-          password: 'test09'
-        },
-        {
-          email: 'riven@104.com.tw',
-          password: 'test10'
-        },
-        {
-          email: 'otis@104.com.tw',
-          password: 'test11'
-        },
-        {
-          email: 'ruby@104.com.tw',
-          password: 'test12'
-        },
-        {
-          email: 'ellis@104.com.tw',
-          password: 'test13'
-        },
-        {
-          email: 'nicole@104.com.tw',
-          password: 'test14'
-        },
-        {
-          email: 'phoebe@104.com.tw',
-          password: 'test15'
-        }
-      ],
-      apiAccount: [],
-      pagination: {},
+      // VUEX改寫
+      // apiAccount: [],
+      // pagination: {},
+      // isLoading: false,
       tempAccount: {},
       isNew: false,
-      isLoading: false,
-      searchText: '',
-      filterData: {}
+      searchText: ''
+    }
+  },
+  computed: {
+    apiAccount () {
+      return this.$store.state.apiAccount
+    },
+    isLoadingStatus () {
+      return this.$store.state.isLoading
+    },
+    pagination () {
+      return this.$store.state.pagination
     }
   },
   created () {
-    this.getAccountList()
+    // this.getAccountList()
+    this.$store.dispatch('getAccountList')
   },
   methods: {
-    getAccountList (page = 1) {
-      this.isLoading = true
-      const api = `${process.env.VUE_APP_API}api/${process.env.VUE_APP_PATH}/admin/products/?page=${page}`
-      this.$http.get(api)
-        .then((res) => {
-          this.isLoading = false
-          if (res.data.success) {
-            // this.apiAccount = res.data.products
-            this.apiAccount = res.data.products.map(({ category: account, content: password, id }) => ({
-              account,
-              password,
-              id
-            }))
-            this.pagination = res.data.pagination
-          } else {
-            console.error(res.data)
-          }
-        })
-    },
+    // getAccountList (page = 1) {
+    //   this.isLoading = true
+    //   const api = `${process.env.VUE_APP_API}api/${process.env.VUE_APP_PATH}/admin/products/?page=${page}`
+    //   this.$http.get(api)
+    //     .then((res) => {
+    //       this.isLoading = false
+    //       if (res.data.success) {
+    //         // this.apiAccount = res.data.products
+    //         this.apiAccount = res.data.products.map(({ category: account, content: password, id }) => ({
+    //           account,
+    //           password,
+    //           id
+    //         }))
+    //         this.pagination = res.data.pagination
+    //       } else {
+    //         console.error(res.data)
+    //       }
+    //     })
+    // },
     openModal (isNew, item) {
       if (isNew) {
         this.tempAccount = {}

@@ -99,10 +99,10 @@ export default {
       } else {
         this.tempProduct = { ...item }
       }
+      console.log(item)
       this.isNew = isNew
       const productComponent = this.$refs.productsModal
       productComponent.show()
-      console.log(this.tempProduct)
     },
     updateProducts (item) {
       this.tempProduct = item
