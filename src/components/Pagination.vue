@@ -9,7 +9,7 @@
           class="page-link"
           href="#"
           aria-label="Previous"
-          @click.prevent="updatePage(item)"
+          @click.prevent="updatePage(1)"
         >
           <span aria-hidden="true">&laquo;</span>
         </a>
@@ -34,7 +34,7 @@
           class="page-link"
           href="#"
           aria-label="Next"
-          @click.prevent="updatePage(item)"
+          @click.prevent="updatePage(pages.total_pages)"
         >
           <span aria-hidden="true">&raquo;</span>
         </a>
@@ -46,29 +46,41 @@
 <script>
 // :pages="{ 頁碼資訊 }"
 // @emitPages="更新頁面事件"
+import { mapState } from 'vuex'
 export default {
-  // props: ['pages'],
-  props: {
-    pages: {
-      type: Object,
-      default () { return {} }
+  // props: {
+  //   pages: {
+  //     type: Object,
+  //     default () { return {} }
+  //   }
+  // },
+  // data () {
+  //   return {
+  //     temPages: {}
+  //   }
+  // },
+  // computed: {
+  //   pages () {
+  //     return this.$store.state.pagination
+  //   }
+  // },
+  // watch: {
+  //   pages () {
+  //     this.temPages = this.pages
+  //   }
+  // },
+  computed: mapState({
+    pagination: state => state.pagination,
+    pages (state) {
+      return state.pagination
     }
-  },
-  data () {
-    return {
-      temPages: {}
-    }
-  },
-  watch: {
-    pages () {
-      this.temPages = this.pages
-    }
-  },
+  }),
   methods: {
     updatePage (item) {
       /* eslint-disable */
-      this.pages.current_page = item
-      this.$emit('emit-pages', item)
+      console.log(item)
+      console.log(this.pages)
+      this.$store.dispatch('getAccountList',item)
     }
   }
 }
