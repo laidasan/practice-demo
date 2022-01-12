@@ -75,7 +75,6 @@ export const Event = Object.freeze({
 
 export default {
   extends: IDisplay,
-
   props: {
     account: {
       type: Object,
@@ -84,23 +83,20 @@ export default {
   },
   data () {
     return {
-      isShow: false,
-      tempAccount: {}
+      isShow: false
     }
+  },
+  computed: {
   },
   methods: {
     onAccountInput (event) {
-      this.$emit(Event.AccountInput, event)
-      this.tempAccount.account = event.target.value
-      this.tempAccount.password = this.account.password
-      this.tempAccount.id = this.account.id
+      const { target: { value: account } } = event
+      this.$emit(Event.AccountInput, { event, account })
     },
+
     onPasswordInput (event) {
-      console.log(event.target.value)
-      this.$emit(Event.PasswordInput, event)
-      this.tempAccount.password = event.target.value
-      this.tempAccount.account = this.account.account
-      this.tempAccount.id = this.account.id
+      const { target: { value: password } } = event
+      this.$emit(Event.PasswordInput, { event, password })
     },
 
     onClose (event) {
@@ -109,10 +105,8 @@ export default {
     },
 
     onConfirm (event) {
-      console.log(this.tempAccount)
       this.hide()
       this.$emit(Event.Confirm, event)
-      this.$emit('update-account', this.tempAccount)
     },
 
     onCancel (event) {
