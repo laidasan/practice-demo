@@ -41,7 +41,7 @@
           <button
             type="button"
             class="btn btn-danger"
-            @click="$emit('del-item')"
+            @click="$emit('deleteConfirm')"
           >
             確認刪除
           </button>
@@ -62,7 +62,6 @@ export default {
   },
   data () {
     return {
-      modal: '',
       isShow: false
     }
   },

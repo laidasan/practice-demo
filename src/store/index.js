@@ -62,6 +62,13 @@ export default createStore({
         console.log(response)
         context.dispatch('getAccountList')
       })
+    },
+    deleteAccount (context, id) {
+      const url = `${process.env.VUE_APP_API}api/${process.env.VUE_APP_PATH}/admin/product/${id}`
+      axios.delete(url).then((response) => {
+        alert('資料已刪除')
+        context.dispatch('getAccountList')
+      })
     }
   },
   modules: {

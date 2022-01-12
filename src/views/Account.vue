@@ -38,7 +38,7 @@
             </button>
             <button
               class="btn btn-outline-danger btn-sm"
-              @click.prevent="openDelAccountModal(item)"
+              @click.prevent="onDelete(item)"
             >
               刪除
             </button>
@@ -60,8 +60,8 @@
   />
   <delModal
     ref="delModal"
-    :item="tempAccount"
-    @del-item="delAccount"
+    :item="deleteAccount"
+    @deleteConfirm="delAccount"
   />
 </template>
 <script>
@@ -90,7 +90,8 @@ export default {
         id: '',
         account: '',
         password: ''
-      }
+      },
+      deleteAccount: {}
     }
   },
   computed: {
@@ -130,20 +131,23 @@ export default {
     },
 
     // 開啟刪除的Modal
-    openDelAccountModal (item) {
-      this.tempAccount = { ...item }
+    onDelete (item) {
       const delComponent = this.$refs.delModal
       delComponent.show()
+      this.deleteAccount = item
     },
 
     delAccount () {
-      const url = `${process.env.VUE_APP_API}api/${process.env.VUE_APP_PATH}/admin/product/${this.tempAccount.id}`
-      this.$http.delete(url).then((response) => {
-        const delComponent = this.$refs.delModal
-        delComponent.hide()
-        alert('資料已刪除')
-        this.getAccountList()
-      })
+      this.$store.dispatch('deleteAccount', this.deleteAccount.id)
+      const delComponent = this.$refs.delModal
+      delComponent.hide()
+      // const url = `${process.env.VUE_APP_API}api/${process.env.VUE_APP_PATH}/admin/product/${this.tempAccount.id}`
+      // this.$http.delete(url).then((response) => {
+      //   const delComponent = this.$refs.delModal
+      //   delComponent.hide()
+      //   alert('資料已刪除')
+      //   this.getAccountList()
+      // })
     },
     // 搜尋
     setSearchText (e) {
