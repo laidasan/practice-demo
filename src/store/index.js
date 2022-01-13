@@ -6,7 +6,7 @@ export default createStore({
     apiAccount: [],
     isLoading: false,
     pagination: {},
-    editAccount: {}
+    editingAccount: {}
   },
   mutations: {
     setAccountData (state, accountData) {
@@ -18,14 +18,29 @@ export default createStore({
     setPagination (state, pageData) {
       state.pagination = pageData
     },
-    setEditAccount (state, itemDeepClone) {
-      console.log('把資料寫入editAccount', itemDeepClone)
-      state.editAccount = itemDeepClone
+    setEditingAccount (state, account) {
+      console.log('把資料寫入editAccount', account)
+      state.editingAccount = {
+        ...state.editingAccount,
+        ...account
+      }
     }
   },
   actions: {
-    getAccountList ({ commit }, page) {
+    setEditingAccount ({ commit }, account) {
+      commit('setEditingAccount', account)
+    },
+
+    showLoading ({ commit }) {
+      console.log('showLoading')
       commit('updateLoading', true)
+    },
+
+    hideLoading ({ commit }) {
+      commit('updateLoading', false)
+    },
+
+    getAccountList ({ commit, dispatch }, page) {
       const api = `${process.env.VUE_APP_API}api/${process.env.VUE_APP_PATH}/admin/products/?page=${page}`
       axios.get(api)
         .then((res) => {
@@ -44,20 +59,25 @@ export default createStore({
             console.error(res.data)
           }
         })
+        .catch(error => {
+          console.error(error)
+        })
     },
-    editAccount (context, item) {
+
+    editAccount (context, account) {
       // 把資料編輯回六角要的格式
       const editedData = {
         title: 'new',
-        category: item.account,
-        content: item.password,
-        id: item.id,
+        category: account.account,
+        content: account.password,
+        id: account.id,
         contentRecheck: '',
         unit: 'new',
         origin_price: 66,
         price: 66
       }
-      const api = `${process.env.VUE_APP_API}api/${process.env.VUE_APP_PATH}/admin/product/${item.id}`
+
+      const api = `${process.env.VUE_APP_API}api/${process.env.VUE_APP_PATH}/admin/product/${account.id}`
       axios.put(api, { data: editedData }).then((response) => {
         console.log(response)
         context.dispatch('getAccountList')

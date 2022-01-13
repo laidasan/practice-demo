@@ -49,18 +49,20 @@
   </table>
   <accountModal
     ref="accountModal"
-    :account="editAccount"
-    @onAccountInput="updateAccount"
+    :account="editingAccount"
+    @onAccountInput="updateAccountEmail"
     @onPasswordInput="updatePassword"
+    @onClose="onAccountModalClose"
     @onConfirm="onAccountModalConfirm"
+    @onCancel="onAccountModalCancel"
   />
   <pagination
     :pages="pagination"
-    @emit-pages="getAccountList"
+    @emit-pages="initAccounts"
   />
   <delModal
     ref="delModal"
-    :item="deleteAccount"
+    :item="deletingAccount"
     @deleteConfirm="delAccount"
   />
 </template>
@@ -69,6 +71,7 @@ import { clone } from 'ramda'
 import Pagination from '../components/Pagination.vue'
 import AccountModal from '@/components/AccountModal.vue'
 import DelModal from '@/components/DelModal.vue'
+import { mapState, mapActions } from 'vuex'
 
 export default {
   components: {
@@ -76,78 +79,90 @@ export default {
     pagination: Pagination,
     delModal: DelModal
   },
-  inject: ['emmiter'],
   data () {
     return {
-      // VUEX改寫
-      // apiAccount: [],
-      // pagination: {},
-      // isLoading: false,
-      // tempAccount: {},
       isNew: false,
       searchText: '',
-      editAccount: {
-        id: '',
-        account: '',
-        password: ''
-      },
-      deleteAccount: {}
+      deletingAccount: {}
     }
   },
   computed: {
-    apiAccount () {
-      return this.$store.state.apiAccount
-    },
-    isLoadingStatus () {
-      return this.$store.state.isLoading
-    },
+    ...mapState([
+      'isLoading',
+      'apiAccount',
+      'editingAccount'
+    ]),
     pagination () {
       return this.$store.state.pagination
     }
   },
   created () {
-    // this.getAccountList()
-    this.$store.dispatch('getAccountList')
+    this.initAccounts()
   },
   methods: {
-    onEdit (item) {
-      this.editAccount = clone(item)
-      const accountComponent = this.$refs.accountModal
-      // this.$store.dispatch('editAccount', item)
-      accountComponent.show()
+    ...mapActions([
+      'showLoading',
+      'hideLoading',
+      'getAccountList',
+      'editAccount',
+      'deleteAccount',
+      'setEditingAccount'
+    ]),
+
+    initAccounts () {
+      this.showLoading()
+      this.getAccountList()
+        .then(() => {
+          this.hideLoading()
+        })
+        .catch((error) => {
+          this.hideLoading()
+          console.error(error)
+        })
     },
 
-    updateAccount ({ event, account }) {
-      this.editAccount.account = account
-      console.log(this.editAccount)
+    updateAccountEmail ({ event, account }) {
+      this.setEditingAccount({ account })
+      console.log('editingAccount', this.editingAccount)
     },
 
     updatePassword ({ event, password }) {
-      this.editAccount.password = password
+      this.setEditingAccount({ password })
     },
 
     onAccountModalConfirm () {
-      this.$store.dispatch('editAccount', this.editAccount)
+      this.editAccount(this.editingAccount)
+        .then(() => {
+          this.$refs.accountModal.hide()
+          this.initAccounts()
+        })
+        .catch(error => {
+          console.error(error)
+        })
+    },
+
+    onAccountModalCancel (event) {
+      this.$refs.accountModal.hide()
+    },
+
+    onAccountModalClose (event) {
+      this.$refs.accountModal.hide()
+    },
+
+    onEdit (item) {
+      this.setEditingAccount(clone(item))
+      this.$refs.accountModal.show()
     },
 
     // 開啟刪除的Modal
     onDelete (item) {
-      const delComponent = this.$refs.delModal
-      delComponent.show()
+      this.$refs.delModal.show()
       this.deleteAccount = item
     },
 
     delAccount () {
-      this.$store.dispatch('deleteAccount', this.deleteAccount.id)
-      const delComponent = this.$refs.delModal
-      delComponent.hide()
-      // const url = `${process.env.VUE_APP_API}api/${process.env.VUE_APP_PATH}/admin/product/${this.tempAccount.id}`
-      // this.$http.delete(url).then((response) => {
-      //   const delComponent = this.$refs.delModal
-      //   delComponent.hide()
-      //   alert('資料已刪除')
-      //   this.getAccountList()
-      // })
+      this.deleteAccount(this.deleteAccount.id)
+      this.$refs.delModal.delComponent.hide()
     },
     // 搜尋
     setSearchText (e) {

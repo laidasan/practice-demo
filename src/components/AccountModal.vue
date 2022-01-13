@@ -83,7 +83,6 @@ export default {
   },
   data () {
     return {
-      isShow: false
     }
   },
   computed: {
@@ -100,17 +99,14 @@ export default {
     },
 
     onClose (event) {
-      this.hide()
       this.$emit(Event.Close, event)
     },
 
     onConfirm (event) {
-      this.hide()
       this.$emit(Event.Confirm, event)
     },
 
     onCancel (event) {
-      this.hide()
       this.$emit(Event.Cancel, event)
     }
   }
